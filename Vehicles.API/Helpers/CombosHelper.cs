@@ -52,7 +52,7 @@ namespace Vehicles.API.Helpers
             return list;
         }
 
-        public IEnumerable<SelectListItem> GetCombosDocumentTypes()
+        public IEnumerable<SelectListItem> GetComboDocumentTypes()
         {
             List<SelectListItem> list = _context.DocumentTypes.Select(x => new SelectListItem
             {
