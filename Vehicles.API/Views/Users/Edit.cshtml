@@ -1,0 +1,35 @@
+﻿@model Vehicles.API.Models.UserViewModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h2>Editar</h2>
+
+<h4>Usuario</h4>
+<hr />
+<div class="row">
+    <div class="col-md-10">
+        <form asp-action="Edit" enctype="multipart/form-data">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="ImageId" />
+            <input type="hidden" asp-for="Email" />
+
+            <partial name="_User" />
+
+            <div class="form-group">
+                <input type="submit" value="Guardar" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-success">Regresar</a>
+            </div>
+        </form>
+    </div>
+    <div class="col-md-2">
+        <img src="@Model.ImageFullPath" style="width: 200px; height: 200px; border-radius: 150px;" />
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+
