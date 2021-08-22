@@ -567,5 +567,114 @@ namespace Vehicles.API.Controllers
 
             return View(history);
         }
+
+        public async Task<IActionResult> AddDetail(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            History history = await _context.Histories.FindAsync(id);
+            if (history == null)
+            {
+                return NotFound();
+            }
+
+            DetailViewModel model = new DetailViewModel
+            {
+                HistoryId = history.Id,
+                Procedures = _combosHelper.GetComboProcedures()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddDetail(DetailViewModel detailViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                History history = await _context.Histories
+                    .Include(x => x.Details)
+                    .FirstOrDefaultAsync(x => x.Id == detailViewModel.HistoryId);
+                if (history == null)
+                {
+                    return NotFound();
+                }
+
+                if (history.Details == null)
+                {
+                    history.Details = new List<Detail>();
+                }
+
+                Detail detail = await _converterHelper.ToDetailAsync(detailViewModel, true);
+                history.Details.Add(detail);
+                _context.Histories.Update(history);
+                await _context.SaveChangesAsync();
+
+                return RedirectToAction(nameof(DetailsHistory), new { id = detailViewModel.HistoryId });
+            }
+
+            detailViewModel.Procedures = _combosHelper.GetComboProcedures();
+            return View(detailViewModel);
+        }
+
+        public async Task<IActionResult> EditDetail(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Detail detail = await _context.Details
+                .Include(x => x.History)
+                .Include(x => x.Procedure)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (detail == null)
+            {
+                return NotFound();
+            }
+
+            DetailViewModel model = _converterHelper.ToDetailViewModel(detail);
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditDetail(int id, DetailViewModel detailViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                Detail detail = await _converterHelper.ToDetailAsync(detailViewModel, false);
+                _context.Details.Update(detail);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(DetailsHistory), new { id = detailViewModel.HistoryId });
+            }
+
+            detailViewModel.Procedures = _combosHelper.GetComboProcedures();
+            return View(detailViewModel);
+        }
+
+        public async Task<IActionResult> DeleteDetail(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Detail detail = await _context.Details
+                .Include(x => x.History)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (detail == null)
+            {
+                return NotFound();
+            }
+
+            _context.Details.Remove(detail);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(DetailsHistory), new { id = detail.History.Id });
+        }
     }
 }
