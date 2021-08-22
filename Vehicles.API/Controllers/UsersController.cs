@@ -483,5 +483,89 @@ namespace Vehicles.API.Controllers
 
             return View(model);
         }
+
+        public async Task<IActionResult> EditHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            History history = await _context.Histories
+                .Include(x => x.Vehicle)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (history == null)
+            {
+                return NotFound();
+            }
+
+            HistoryViewModel model = new HistoryViewModel
+            {
+                Mileage = history.Mileage,
+                Remarks = history.Remarks,
+                VehicleId = history.Vehicle.Id
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditHistory(int id, HistoryViewModel historyViewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                History history = await _context.Histories.FindAsync(id);
+                history.Mileage = historyViewModel.Mileage;
+                history.Remarks = historyViewModel.Remarks;
+                _context.Histories.Update(history);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(DetailsVehicle), new { id = historyViewModel.VehicleId });
+            }
+
+            return View(historyViewModel);
+        }
+
+        public async Task<IActionResult> DeleteHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            History history = await _context.Histories
+                .Include(x => x.Details)
+                .Include(x => x.Vehicle)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (history == null)
+            {
+                return NotFound();
+            }
+
+            _context.Histories.Remove(history);
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(DetailsVehicle), new { id = history.Vehicle.Id });
+        }
+
+        public async Task<IActionResult> DetailsHistory(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            History history = await _context.Histories
+                .Include(x => x.Details)
+                .ThenInclude(x => x.Procedure)
+                .Include(x => x.Vehicle)
+                .ThenInclude(x => x.VehiclePhotos)
+                .FirstOrDefaultAsync(x => x.Id == id);
+            if (history == null)
+            {
+                return NotFound();
+            }
+
+            return View(history);
+        }
     }
 }
