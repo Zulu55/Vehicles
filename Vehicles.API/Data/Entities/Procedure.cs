@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Vehicles.API.Data.Entities
 {
@@ -17,6 +18,7 @@ namespace Vehicles.API.Data.Entities
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public decimal Price { get; set; }
 
+        [JsonIgnore]
         public ICollection<Detail> Details { get; set; }
     }
 }
