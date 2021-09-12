@@ -7,8 +7,8 @@ namespace Vehicles.API.Data.Entities
     {
         public int Id { get; set; }
 
-        [JsonIgnore]
         [Display(Name = "Historia")]
+        [JsonIgnore]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public History History { get; set; }
 
