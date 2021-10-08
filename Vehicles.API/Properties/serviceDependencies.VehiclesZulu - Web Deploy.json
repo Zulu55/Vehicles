@@ -1,15 +1,15 @@
 {
   "dependencies": {
+    "mssql1": {
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/itmzuludbserver/databases/Vehicles.API_db",
+      "type": "mssql.azure",
+      "connectionId": "ConnectionStrings:DefaultConnection",
+      "secretStore": "AzureAppSettings"
+    },
     "storage1": {
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Storage/storageAccounts/vehicleszulu",
       "type": "storage.azure",
       "connectionId": "Blob:ConnectionString",
-      "secretStore": "AzureAppSettings"
-    },
-    "mssql1": {
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/zuludbserver/databases/Vehicles.API_db",
-      "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DefaultConnection",
       "secretStore": "AzureAppSettings"
     }
   }
