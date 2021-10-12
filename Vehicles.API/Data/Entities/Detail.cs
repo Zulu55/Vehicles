@@ -19,16 +19,16 @@ namespace Vehicles.API.Data.Entities
         [Display(Name = "Precio Mano de Obra")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        public decimal LaborPrice { get; set; }
+        public int LaborPrice { get; set; }
 
         [Display(Name = "Precio Repuestos")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
-        public decimal SparePartsPrice { get; set; }
+        public int SparePartsPrice { get; set; }
 
         [Display(Name = "Total")]
         [DisplayFormat(DataFormatString = "{0:C2}")]
-        public decimal TotalPrice => LaborPrice + SparePartsPrice;
+        public int TotalPrice => LaborPrice + SparePartsPrice;
 
         [Display(Name = "Observación")]
         [DataType(DataType.MultilineText)]
