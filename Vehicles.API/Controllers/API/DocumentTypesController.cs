@@ -23,6 +23,7 @@ namespace Vehicles.API.Controllers.API
             _context = context;
         }
 
+        [AllowAnonymous]
         [HttpGet]
         public async Task<ActionResult<IEnumerable<DocumentType>>> GetDocumentTypes()
         {
