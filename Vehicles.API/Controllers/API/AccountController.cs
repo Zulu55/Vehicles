@@ -139,6 +139,7 @@ namespace Vehicles.API.Controllers.API
 
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
+
         [Route("ChangePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
@@ -165,6 +166,32 @@ namespace Vehicles.API.Controllers.API
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpPost]
+        [Route("RecoverPassword")]
+        public async Task<IActionResult> RecoverPassword(RecoverPasswordViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await _userHelper.GetUserAsync(model.Email);
+                if (user == null)
+                {
+                    return BadRequest("El correo ingresado no corresponde a ningún usuario.");
+                }
+
+                string myToken = await _userHelper.GeneratePasswordResetTokenAsync(user);
+                string link = Url.Action(
+                    "ResetPassword",
+                    "Account",
+                    new { token = myToken }, protocol: HttpContext.Request.Scheme);
+                _mailHelper.SendMail(model.Email, "Vehicles - Reseteo de contraseña", $"<h1>Vehicles - Reseteo de contraseña</h1>" +
+                    $"Para establecer una nueva contraseña haga clic en el siguiente enlace:</br></br>" +
+                    $"<a href = \"{link}\">Cambio de Contraseña</a>");
+                return Ok("Las instrucciones para el cambio de contraseña han sido enviadas a su email.");
+            }
+
+            return BadRequest(model);
         }
     }
 }
