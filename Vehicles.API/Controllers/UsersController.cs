@@ -43,6 +43,15 @@ namespace Vehicles.API.Controllers
                 .ToListAsync());
         }
 
+        public async Task<IActionResult> Index2()
+        {
+            return View(await _context.Users
+                .Include(x => x.DocumentType)
+                .Include(x => x.Vehicles)
+                .Where(x => x.UserType == UserType.Admin)
+                .ToListAsync());
+        }
+
         public IActionResult Create()
         {
             UserViewModel model = new UserViewModel
@@ -83,6 +92,52 @@ namespace Vehicles.API.Controllers
                     $"por favor hacer clic en el siguiente enlace: </br></br><a href = \"{tokenLink}\">Confirmar Email</a>");
 
                 return RedirectToAction(nameof(Index));
+            }
+
+            model.DocumentTypes = _combosHelper.GetComboDocumentTypes();
+            return View(model);
+        }
+
+        public IActionResult Create2()
+        {
+            UserViewModel model = new UserViewModel
+            {
+                DocumentTypes = _combosHelper.GetComboDocumentTypes()
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create2(UserViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                Guid imageId = Guid.Empty;
+
+                if (model.ImageFile != null)
+                {
+                    imageId = await _blobHelper.UploadBlobAsync(model.ImageFile, "users");
+                }
+
+                User user = await _converterHelper.ToUserAsync(model, imageId, true);
+                user.UserType = UserType.Admin;
+                await _userHelper.AddUserAsync(user, "123456");
+                await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
+
+                string myToken = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+                string tokenLink = Url.Action("ConfirmEmail", "Account", new
+                {
+                    userid = user.Id,
+                    token = myToken
+                }, protocol: HttpContext.Request.Scheme);
+
+                Response response = _mailHelper.SendMail(model.Email, "Vehicles - Confirmación de cuenta", $"<h1>Vehicles - Confirmación de cuenta</h1>" +
+                    $"Para habilitar el usuario, " +
+                    $"por favor hacer clic en el siguiente enlace: </br></br><a href = \"{tokenLink}\">Confirmar Email</a>");
+
+                return RedirectToAction(nameof(Index2));
             }
 
             model.DocumentTypes = _combosHelper.GetComboDocumentTypes();
@@ -140,7 +195,11 @@ namespace Vehicles.API.Controllers
                 return NotFound();
             }
 
-            await _blobHelper.DeleteBlobAsync(user.ImageId, "users");
+            if (user.ImageId != Guid.Empty)
+            {
+                await _blobHelper.DeleteBlobAsync(user.ImageId, "users");
+            }
+
             await _userHelper.DeleteUserAsync(user);
             return RedirectToAction(nameof(Index));
         }
