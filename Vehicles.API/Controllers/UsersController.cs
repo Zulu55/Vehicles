@@ -14,7 +14,7 @@ using Vehicles.Common.Models;
 
 namespace Vehicles.API.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin, User")]
     public class UsersController : Controller
     {
         private readonly DataContext _context;
@@ -32,6 +32,17 @@ namespace Vehicles.API.Controllers
             _converterHelper = converterHelper;
             _blobHelper = blobHelper;
             _mailHelper = mailHelper;
+        }
+
+        public async Task<IActionResult> MyVehicles()
+        {
+            User user = await _userHelper.GetUserAsync(User.Identity.Name);
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction(nameof(Details), new { id = user.Id });
         }
 
         public async Task<IActionResult> Index()

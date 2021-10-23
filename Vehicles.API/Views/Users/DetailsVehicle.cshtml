@@ -57,7 +57,10 @@
     </div>
 </div>
 <div>
-    <a asp-action="AddHistory" asp-route-id="@Model.Id" class="btn btn-primary">Adicionar Historia</a>
+    @if (User.IsInRole("Admin"))
+    {
+        <a asp-action="AddHistory" asp-route-id="@Model.Id" class="btn btn-primary">Adicionar Historia</a>
+    }
     <a asp-action="EditVehicle" asp-route-id="@Model.Id" class="btn btn-warning">Editar Vehículo</a>
     <a asp-action="Details" asp-route-id="@Model.User.Id" class="btn btn-success">Regresar</a>
 </div>
@@ -129,9 +132,15 @@
                                     @Html.DisplayFor(modelItem => item.Total)
                                 </td>
                                 <td>
-                                    <a asp-action="EditHistory" asp-route-id="@item.Id" class="btn btn-warning">Editar</a>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <a asp-action="EditHistory" asp-route-id="@item.Id" class="btn btn-warning">Editar</a>
+                                    }
                                     <a asp-action="DetailsHistory" asp-route-id="@item.Id" class="btn btn-info">Detalle<i class="glyphicon glyphicon-align-justify"></i></a>
-                                    <button data-id="@item.Id" class="btn btn-danger deleteItem" data-toggle="modal" data-target="#deleteDialog">Borrar</button>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <button data-id="@item.Id" class="btn btn-danger deleteItem" data-toggle="modal" data-target="#deleteDialog">Borrar</button>
+                                    }
                                 </td>
                             </tr>
                         }
