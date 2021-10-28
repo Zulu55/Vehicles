@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Vehicles.API.Data.Entities;
 using Vehicles.Common.Enums;
 
 namespace Vehicles.API.Models

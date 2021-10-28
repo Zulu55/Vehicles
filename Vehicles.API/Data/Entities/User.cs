@@ -24,7 +24,6 @@ namespace Vehicles.API.Data.Entities
 
         [Display(Name = "Documento")]
         [MaxLength(20, ErrorMessage = "El campo {0} no puede tener más de {1} carácteres.")]
-        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string Document { get; set; }
 
         [Display(Name = "Dirección")]
@@ -35,9 +34,19 @@ namespace Vehicles.API.Data.Entities
         public Guid ImageId { get; set; }
 
         [Display(Name = "Foto")]
-        public string ImageFullPath => ImageId == Guid.Empty
-            ? $"https://vehicleszulu.azurewebsites.net/images/noimage.png"
-            : $"https://vehicleszulu.blob.core.windows.net/users/{ImageId}";
+        public string ImageFullPath => LoginType == LoginType.Email
+            ? ImageId == Guid.Empty
+                ? $"https://vehicleszulu.azurewebsites.net/images/noimage.png"
+                : $"https://vehicleszulu.blob.core.windows.net/users/{ImageId}"
+            : string.IsNullOrEmpty(SocialImageURL)
+                ? $"https://vehicleszulu.azurewebsites.net/images/noimage.png"
+                : SocialImageURL;
+
+        [Display(Name = "Tipo de login")]
+        public LoginType LoginType { get; set; }
+
+        [Display(Name = "Dirección")]
+        public string SocialImageURL { get; set; }
 
         [Display(Name = "Tipo de usuario")]
         public UserType UserType { get; set; }
