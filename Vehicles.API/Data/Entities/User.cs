@@ -35,9 +35,19 @@ namespace Vehicles.API.Data.Entities
         public Guid ImageId { get; set; }
 
         [Display(Name = "Foto")]
-        public string ImageFullPath => ImageId == Guid.Empty
-            ? $"https://vehicleszulu.azurewebsites.net/images/noimage.png"
-            : $"https://vehicleszulu.blob.core.windows.net/users/{ImageId}";
+        public string ImageFullPath => LoginType == LoginType.Email
+            ? ImageId == Guid.Empty
+                ? $"https://vehicleszulu.azurewebsites.net/images/noimage.png"
+                : $"https://vehicleszulu.blob.core.windows.net/users/{ImageId}"
+            : string.IsNullOrEmpty(SocialImageURL)
+                ? $"https://vehicleszulu.azurewebsites.net/images/noimage.png"
+                : SocialImageURL;
+
+        [Display(Name = "Foto")]
+        public string SocialImageURL { get; set; }
+
+        [Display(Name = "Tipo de login")]
+        public LoginType LoginType { get; set; }
 
         [Display(Name = "Tipo de usuario")]
         public UserType UserType { get; set; }

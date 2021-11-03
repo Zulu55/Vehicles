@@ -108,28 +108,7 @@ namespace Vehicles.API.Controllers.API
 
                     if (result.Succeeded)
                     {
-                        Claim[] claims = new[]
-                        {
-                            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-                            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-                        };
-
-                        SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
-                        SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                        JwtSecurityToken token = new JwtSecurityToken(
-                            _configuration["Tokens:Issuer"],
-                            _configuration["Tokens:Audience"],
-                            claims,
-                            expires: DateTime.UtcNow.AddDays(99),
-                            signingCredentials: credentials);
-                        var results = new
-                        {
-                            token = new JwtSecurityTokenHandler().WriteToken(token),
-                            expiration = token.ValidTo,
-                            user
-                        };
-
-                        return Created(string.Empty, results);
+                        return CreateToken(user);
                     }
                 }
             }
@@ -137,9 +116,34 @@ namespace Vehicles.API.Controllers.API
             return BadRequest();
         }
 
+        private IActionResult CreateToken(User user)
+        {
+            Claim[] claims = new[]
+            {
+                new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
+            };
+
+            SymmetricSecurityKey key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Tokens:Key"]));
+            SigningCredentials credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            JwtSecurityToken token = new JwtSecurityToken(
+                _configuration["Tokens:Issuer"],
+                _configuration["Tokens:Audience"],
+                claims,
+                expires: DateTime.UtcNow.AddDays(99),
+                signingCredentials: credentials);
+            var results = new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo,
+                user
+            };
+
+            return Created(string.Empty, results);
+        }
+
         [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
         [HttpPost]
-
         [Route("ChangePassword")]
         public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
         {
@@ -166,6 +170,107 @@ namespace Vehicles.API.Controllers.API
             }
 
             return BadRequest(ModelState);
+        }
+
+        [HttpPost]
+        [Route("SocialLogin")]
+        public async Task<IActionResult> SocialLogin(SocialLoginRequest model)
+        {
+            if (ModelState.IsValid)
+            {
+                User user = await _userHelper.GetUserAsync(model.Email);
+                if (user != null)
+                {
+                    if (user.LoginType != model.LoginType)
+                    {
+                        return BadRequest("El usuario ya inció sesión previamente por email o por otra red social");
+                    }
+
+                    Microsoft.AspNetCore.Identity.SignInResult result = await _userHelper.ValidatePasswordAsync(user, model.Id);
+
+                    if (result.Succeeded)
+                    {
+                        await UpdateUserAsync(user, model);
+                        return CreateToken(user);
+                    }
+                }
+                else
+                {
+                    await CreateUserAsync(model);
+                    user = await _userHelper.GetUserAsync(model.Email);
+                    return CreateToken(user);
+                }
+            }
+
+            return BadRequest();
+        }
+
+        private async Task UpdateUserAsync(User user, SocialLoginRequest model)
+        {
+            user.SocialImageURL = model.PhotoURL;
+            if (!string.IsNullOrEmpty(model.FirstName))
+            {
+                user.FirstName = model.FirstName;
+            }
+
+            if (!string.IsNullOrEmpty(model.LastName))
+            {
+                user.LastName = model.LastName;
+            }
+
+            await _userHelper.UpdateUserAsync(user);
+        }
+
+        private async Task CreateUserAsync(SocialLoginRequest model)
+        {
+            FirstLastName firstLastName = SeparateFirstAndLastName(model.FullName);
+            if (string.IsNullOrEmpty(model.FirstName))
+            {
+                model.FirstName = firstLastName.FirstName;
+            }
+
+            if (string.IsNullOrEmpty(model.LastName))
+            {
+                model.LastName = firstLastName.LastName;
+            }
+
+            User user = new()
+            {
+                Address = "Pendiente",
+                Document = "Pendiente",
+                DocumentType = _context.DocumentTypes.FirstOrDefault(),
+                Email = model.Email,
+                FirstName = model.FirstName,
+                LastName = model.LastName,
+                LoginType = model.LoginType,
+                PhoneNumber = "Pendiente",
+                SocialImageURL = model.PhotoURL,
+                UserName = model.Email,
+                UserType = UserType.User,
+            };
+
+            await _userHelper.AddUserAsync(user, model.Id);
+            await _userHelper.AddUserToRoleAsync(user, user.UserType.ToString());
+            string token = await _userHelper.GenerateEmailConfirmationTokenAsync(user);
+            await _userHelper.ConfirmEmailAsync(user, token);
+        }
+
+        private FirstLastName SeparateFirstAndLastName(string fullName)
+        {
+            int pos = fullName.IndexOf(' ');
+            FirstLastName firstLastName = new();
+            if (pos == -1)
+            {
+                firstLastName.FirstName = fullName;
+                firstLastName.LastName = fullName;
+            }
+            else
+            {
+                firstLastName.FirstName = fullName.Substring(0, pos);
+                firstLastName.LastName = fullName.Substring(pos + 1, fullName.Length - pos - 1);
+            }
+
+            return firstLastName;
         }
 
         [HttpPost]
