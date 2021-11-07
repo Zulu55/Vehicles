@@ -31,6 +31,9 @@
                                 @Html.DisplayNameFor(model => model.Email)
                             </th>
                             <th>
+                                @Html.DisplayNameFor(model => model.CountryCode)
+                            </th>
+                            <th>
                                 @Html.DisplayNameFor(model => model.PhoneNumber)
                             </th>
                             <th>
@@ -45,33 +48,36 @@
                     <tbody>
                         @foreach (var item in Model)
                         {
-                            <tr>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.FullName)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.DocumentType.Description)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Document)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.Email)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.PhoneNumber)
-                                </td>
-                                <td>
-                                    @Html.DisplayFor(modelItem => item.VehiclesCount)
-                                </td>
-                                <td>
-                                    <img src="@item.ImageFullPath" style="width: 100px; height: 100px; border-radius: 150px;" />
-                                </td>
-                                <td>
-                                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Editar</a>
-                                    <button data-id="@item.Id" class="btn btn-danger deleteItem" data-toggle="modal" data-target="#deleteDialog">Borrar</button>
-                                </td>
-                            </tr>
+                        <tr>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.FullName)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.DocumentType.Description)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Document)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Email)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CountryCode)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.PhoneNumber)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.VehiclesCount)
+                            </td>
+                            <td>
+                                <img src="@item.ImageFullPath" style="width: 100px; height: 100px; border-radius: 150px;" />
+                            </td>
+                            <td>
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-warning">Editar</a>
+                                <button data-id="@item.Id" class="btn btn-danger deleteItem" data-toggle="modal" data-target="#deleteDialog">Borrar</button>
+                            </td>
+                        </tr>
                         }
                     </tbody>
                 </table>

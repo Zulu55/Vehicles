@@ -45,6 +45,7 @@ namespace Vehicles.API.Data
                     Email = email,
                     FirstName = firstName,
                     LastName = lastName,
+                    CountryCode = "57",
                     PhoneNumber = phoneNumber,
                     UserName = email,
                     UserType = userType
