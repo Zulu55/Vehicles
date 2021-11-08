@@ -97,6 +97,7 @@ namespace Vehicles.API.Controllers.API
             user = new User
             {
                 Address = request.Address,
+                CountryCode = request.CountryCode,
                 Document = request.Document,
                 DocumentType = documentType,
                 Email = request.Email,
@@ -157,6 +158,7 @@ namespace Vehicles.API.Controllers.API
             }
 
             user.Address = request.Address;
+            user.CountryCode = request.CountryCode;
             user.Document = request.Document;
             user.DocumentType = documentType;
             user.FirstName = request.FirstName;

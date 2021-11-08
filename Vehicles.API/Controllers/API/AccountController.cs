@@ -67,6 +67,7 @@ namespace Vehicles.API.Controllers.API
             user = new User
             {
                 Address = request.Address,
+                CountryCode = request.CountryCode,
                 Document = request.Document,
                 DocumentType = documentType,
                 Email = request.Email,
