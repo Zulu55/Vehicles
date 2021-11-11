@@ -25,6 +25,10 @@ namespace Vehicles.API.Models.Request
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string Address { get; set; }
 
+        [MaxLength(5, ErrorMessage = "El campo {0} no puede tener más de {1} carácteres.")]
+        [Required(ErrorMessage = "El campo {0} es obligatorio.")]
+        public string CountryCode { get; set; }
+
         [MaxLength(20, ErrorMessage = "El campo {0} no puede tener más de {1} carácteres.")]
         [Required(ErrorMessage = "El campo {0} es obligatorio.")]
         public string PhoneNumber { get; set; }
