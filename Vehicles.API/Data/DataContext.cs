@@ -18,6 +18,8 @@ namespace Vehicles.API.Data
 
         public DbSet<History> Histories { get; set; }
 
+        public DbSet<Parameters> Parameters { get; set; }
+
         public DbSet<Procedure> Procedures { get; set; }
 
         public DbSet<Vehicle> Vehicles { get; set; }

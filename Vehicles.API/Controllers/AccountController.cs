@@ -181,13 +181,13 @@ namespace Vehicles.API.Controllers
             return View(model);
         }
 
-        public IActionResult ChangePassword()
+        public IActionResult ChangePasswordWeb()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordViewModel model)
+        public async Task<IActionResult> ChangePasswordWeb(ChangePasswordViewModel model)
         {
             if (ModelState.IsValid)
             {

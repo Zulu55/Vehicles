@@ -119,6 +119,8 @@ namespace Vehicles.API.Controllers.API
 
         private IActionResult CreateToken(User user)
         {
+            Parameters parameters = _context.Parameters.FirstOrDefault();
+
             Claim[] claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, user.Email),
@@ -137,7 +139,8 @@ namespace Vehicles.API.Controllers.API
             {
                 token = new JwtSecurityTokenHandler().WriteToken(token),
                 expiration = token.ValidTo,
-                user
+                user,
+                parameters
             };
 
             return Created(string.Empty, results);
